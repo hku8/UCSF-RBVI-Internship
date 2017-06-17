@@ -1,5 +1,8 @@
 # vim: set expandtab shiftwidth=4 softtabstop=4:
 
+import sys
+print (sys.version + "\n" + sys.executable)
+print ("-"*50+ "\n")
 
 def open_mol2(session, stream, name):
     structures = []
@@ -18,28 +21,32 @@ def open_mol2(session, stream, name):
 
 
 def _read_block(session, stream):
-
+    """test docstring"""
     # First section should be commented out
     # Second section: "@<TRIPOS>MOLECULE"
     # Third section: "@<TRIPOS>ATOM"
     # Fourth section: "@<TRIPOS>BOND"
     # Fifth section: "@<TRIPOS>SUBSTRUCTURE"
 
-    # count_line = stream.readline()
-    # if not count_line:
-    #     return None
-    # try:
-    #     count = int(count_line)
-    # except ValueError:
-    #     # XXX: Should emit an error message
-    #     return None
-    # from chimerax.core.atomic import AtomicStructure
-    # s = AtomicStructure(session)
+    import ast
+
+
+
+    def pl(num_of_lines=None):
+        """for testing purposes only. delete later"""
+        if num_of_lines is None:
+            num_of_lines = 1
+        print("\n" + ("=")*30 + "\nbeginning test print...\n" + ("=")*30 + "\n")
+        for _ in range(0, num_of_lines):
+            print(stream.readline().strip())
+        print("\n" + ("=")*30 + "\nending test print\n"+("=")*30 + "\n")
+
+
+
 
     comment = stream.readline()
 
-    first_sec = []
-    property_dic = {}
+    property_dict = {}
 
     while comment[0] == "#":
         line = comment.replace("#", "")
@@ -48,34 +55,49 @@ def _read_block(session, stream):
         if ":" not in line:
             for i in range(len(line), 1, -1):
                 if line[i-1] == " ":
-                    property_dic.update({line[:i].strip(): line[i:].strip()})
+                    property_dict[line[:i].strip()] = line[i:].strip()
                     break
+
         else:
             try:
-                property_dic[str(parts[0])] = float(parts[1])
+                property_dict[str(parts[0])] = ast.literal_eval(parts[1])
 
             except ValueError:
-                property_dic[str(parts[0])] = str(parts[1])
+                property_dict[str(parts[0])] = str(parts[1])
 
-        first_sec.append(line)
         comment = stream.readline()
 
-    for k, v in property_dic.items():
-        print(k, ":", v)
-    # print(property_dic)
+    for key, value in property_dict.items():
+        print(key, ":", value)
+
+    # Property Dictionary should be completed at this point
+
+    ###test print. Delete later
+    print()
+    for i in property_dict:
+        val = property_dict[i]
+        print(str(val) + " : " + str(type(val)))
+
 
     while True:
-        count_line = stream.readline()
-        if "@<TRIPOS>ATOM" in count_line:
-            stream.readline()
-
-            break
-    # while count_line[0].isdigit:
-    #     print(stream.readline())
-    # return s
+        if "@<TRIPOS>ATOM" in stream.readline():
+            atom_line = stream.readline()
+            parts = atom_line.split()
+            print (parts)
 
 
-_read_block(None, open("ras.mol2", "r"))
+
+    
 
 
-# try to ask if you can do a pip install package that would not disappear
+
+
+
+
+# _read_block(None, open("ras.mol2", "r"))
+_read_block(None, open("ras(short_version).mol2", "r"))
+
+
+
+
+# note to self: try to ask if you can do a pip install package that would not disappear
