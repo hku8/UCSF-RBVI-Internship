@@ -27,7 +27,7 @@ OS = $(patsubst CYGWIN_NT%,CYGWIN_NT,$(shell uname -s))
 # CHIMERAX_APP is the ChimeraX install folder
 ifeq ($(OS),CYGWIN_NT)
 # Windows
-CHIMERAX_APP = "/c/Program Files/ChimeraX.app"
+CHIMERAX_APP = "/c/Program Files/ChimeraX-TEST.app"
 endif
 ifeq ($(OS),Darwin)
 # Mac
