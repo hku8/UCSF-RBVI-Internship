@@ -19,12 +19,6 @@ Implements command "sample count" to report number of atoms and bonds.
     <Category name="General"/>
   </Categories>
 
-  <!-- Compiled modules in bundle
-       CModule gives the name of the module
-       Source files are listed in one or more SourceFile elements -->
-  <CModule name="_sample">
-    <SourceFile>src/_sample.cpp</SourceFile>
-  </CModule>
 
   <!-- Dependencies on other ChimeraX/Python packages -->
   <Dependencies>
@@ -50,8 +44,8 @@ Implements command "sample count" to report number of atoms and bonds.
 ]
     <ChimeraXClassifier>ChimeraX :: Tool :: Sample Tool :: General :: Log model atom and bond counts</ChimeraXClassifier>
     <ChimeraXClassifier>ChimeraX :: Command :: sample count :: General :: Log model atom and bond counts</ChimeraXClassifier>
-    <ChimeraXClassifier>ChimeraX :: DataFormat :: XYZ :: :: Molecule structure :: .xyz :: :: :: :: :: XYZ format :: utf-8</ChimeraXClassifier>
-    <ChimeraXClassifier>ChimeraX :: Open :: XYZ :: XYZ ::</ChimeraXClassifier>
+    <ChimeraXClassifier>ChimeraX :: DataFormat :: mol2 :: :: Molecule structure :: .mol2 :: :: :: :: :: mol2 format :: utf-8</ChimeraXClassifier>
+    <ChimeraXClassifier>ChimeraX :: Open :: mol2 :: mol2 ::</ChimeraXClassifier>
 ]
   </Classifiers>
 
