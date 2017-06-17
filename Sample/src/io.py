@@ -72,18 +72,19 @@ def _read_block(session, stream):
 
     # Property Dictionary should be completed at this point
 
-    ###test print. Delete later
+    # ###test print. Delete later
     print()
     for i in property_dict:
         val = property_dict[i]
         print(str(val) + " : " + str(type(val)))
 
 
-    while True:
-        if "@<TRIPOS>ATOM" in stream.readline():
-            atom_line = stream.readline()
-            parts = atom_line.split()
-            print (parts)
+    # while True:
+    #     if "@<TRIPOS>ATOM" in stream.readline():
+    #         atom_line = stream.readline()
+    #         parts = atom_line.split()
+    #         print (parts)
+    
 
 
 
@@ -94,8 +95,8 @@ def _read_block(session, stream):
 
 
 
-# _read_block(None, open("ras.mol2", "r"))
-_read_block(None, open("ras(short_version).mol2", "r"))
+_read_block(None, open("ras.mol2", "r"))
+# _read_block(None, open("ras(short_version).mol2", "r"))
 
 
 
