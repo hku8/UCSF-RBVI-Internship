@@ -29,6 +29,12 @@ def print_lines(stream, num_of_lines=None):
         print(stream.readline().strip())
     print("\n" + ("=")*30 + "\nending test print\n"+("=")*30 + "\n")
 
+def print_dict(dict):
+    # print(s)
+    for key, value in dict.items():
+        print(key, ":", value,)
+    print()
+
 
 def _read_block(session, stream):
     """test docstring"""
@@ -43,9 +49,9 @@ def _read_block(session, stream):
 
     read_comments(session, stream)
     read_molecule(session, stream)
-    # read_atom(session, stream)
-    # read_bond(session, stream)
-    # read_substructure(session, stream)
+    read_atom(session, stream)
+    read_bond(session, stream)
+    read_substructure(session, stream)
 
     # s = AtomicStructure(session)
 
@@ -53,7 +59,7 @@ def _read_block(session, stream):
 def read_comments(session, stream):
 
     import ast
-    property_dict = {}
+    comment_dict = {}
 
     comment = stream.readline()
     while comment[0] == "#":
@@ -63,19 +69,18 @@ def read_comments(session, stream):
         if ":" not in line:
             for i in range(len(line), 1, -1):
                 if line[i-1] == " ":
-                    property_dict[line[:i].strip()] = line[i:].strip()
+                    comment_dict[line[:i].strip()] = line[i:].strip()
                     break
         else:
             try:
-                property_dict[str(parts[0])] = ast.literal_eval(parts[1])
+                comment_dict[str(parts[0])] = ast.literal_eval(parts[1])
 
             except ValueError:
-                property_dict[str(parts[0])] = str(parts[1])
+                comment_dict[str(parts[0])] = str(parts[1])
 
         comment = stream.readline()
 
-    for key, value in property_dict.items():
-        print(key, ":", value)
+    print_dict(comment_dict)
 
 def read_molecule(sesson, stream):
 
@@ -85,31 +90,17 @@ def read_molecule(sesson, stream):
     molecular_dict = {}
     mol_lables = ["mol_name", ["num_atoms", "num_bonds", "num_subst", "num_feat", "num_sets"],\
     "mol_type", "charge_type", "status_bits"]
-    print(len(mol_lables))
 
     for label in mol_lables:
         molecule_line = stream.readline().split()
-        print(molecule_line)
-        print(label)
         try:
             if all(isinstance(ast.literal_eval(item), int) for item in molecule_line):
-                # print(molecule_line)
-                pass
-
-        except ValueError:
-            print("VALUERROR")
-        except SyntaxError:
-            print("test")
+                molecular_dict.update(dict(zip(label, molecule_line)))
+        except (ValueError, SyntaxError):
+            molecular_dict[label] = molecule_line[0]
 
 
-
-    # Property Dictionary should be completed at this point
-
-    # test print to check value types. Delete later
-    # print()
-    # for i in property_dict:
-    #     val = property_dict[i]
-    #     print(str(val) + " : " + str(type(val)))
+    print_dict(molecular_dict)
 
 
 def read_atom(session, stream):
@@ -126,16 +117,19 @@ def read_atom(session, stream):
 
     for _ in range(atom_count):
         atom_line = stream.readline()
-        if not atom_line[0].isdigit: ###THIS DOES NOT WORK
-            print(atom_line)
-            print("FAILED")
-            break
-        if not atom_line:
+        print("test:", atom_line)
+        if atom_line[0] == "":
             print("no line found")
+        try:
+            if isinstance(ast.literal_eval(atom_line[0]), int):
+                pass ###THIS DOES NOT WORK
+        except:
+            print("error on line: ", atom_line)
+            return None
             return None
         parts = atom_line.split()
         if len(parts) != 9:
-            print("error: not enough entries")
+            print("error: not enough entries on line: ", atom_line)
             return None
         # if not isinstance(int(parts[0]), int):
         #     print("error: first value is needs to be an integer")
@@ -150,9 +144,7 @@ def read_atom(session, stream):
                 val_list.append(str(value))
 
     # PRINT TEST. DELETE LATER
-    for key, value in atom_dict.items():
-        print(key, ":", value)
-
+    print_dict(atom_dict)
 
 def read_bond(session, stream):
 
@@ -176,25 +168,26 @@ def read_bond(session, stream):
 
         bond_dict[int(parts[0])] = parts[1:3]
 
-    for key, value in bond_dict.items():
-        print(key, ":", value)
-
+    print_dict(bond_dict)
 
 def read_substructure(session, stream):
 
     while "@<TRIPOS>SUBSTRUCTURE" not in stream.readline():
         pass
 
-    substructure_line = stream.readline().split()
-    # substructure_prop = {
-    # "subst_id" : ,
-    # "subst_name" :,
-    # "root_atom" : ,
-    # "subst_type" : ,
-    # "dict_type" : ,
-    # }
 
-    # stream.close()
+    import ast
+
+    substructure_dict = {}
+    substructure_labels = ["subst_id", "subst_name", "root_atom", "subst_type",\
+    "dict_type", "chain", "sub_type", "inter_bonds", "status", "comment" ]
+    substructure_line = stream.readline().split()
+
+    for _ in substructure_labels:
+        substructure_dict.update(dict(zip(substructure_labels, substructure_line)))
+
+    print_dict(substructure_dict)
+
 
 
 # _read_block(None, open("ras.mol2", "r"))
