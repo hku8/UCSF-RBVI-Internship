@@ -48,9 +48,9 @@ def _read_block(session, stream):
     from chimerax.core.atomic import AtomicStructure
 
     read_comments(session, stream)
-    read_molecule(session, stream)
-    read_atom(session, stream)
-    read_bond(session, stream)
+    x = read_molecule(session, stream)
+    read_atom(session, stream, int(x["num_atoms"]))
+    read_bond(session, stream, int(x["num_bonds"]))
     read_substructure(session, stream)
 
     # s = AtomicStructure(session)
@@ -101,31 +101,27 @@ def read_molecule(sesson, stream):
 
 
     print_dict(molecular_dict)
+    return molecular_dict
 
 
-def read_atom(session, stream):
+def read_atom(session, stream, atom_count):
 
     import ast
     while "@<TRIPOS>ATOM" not in stream.readline():
         pass
 
-    ###TEMP STATEMENT. ADD HANNAH'S CODE###
-    atom_count = 22
-    ###
 
     atom_dict = {}
 
     for _ in range(atom_count):
-        atom_line = stream.readline()
-        print("test:", atom_line)
-        if atom_line[0] == "":
-            print("no line found")
+        atom_line = stream.readline().strip()
+        if len(atom_line) == 0:
+            print("error: no line found")
         try:
             if isinstance(ast.literal_eval(atom_line[0]), int):
-                pass ###THIS DOES NOT WORK
+                pass
         except:
             print("error on line: ", atom_line)
-            return None
             return None
         parts = atom_line.split()
         if len(parts) != 9:
@@ -146,14 +142,10 @@ def read_atom(session, stream):
     # PRINT TEST. DELETE LATER
     print_dict(atom_dict)
 
-def read_bond(session, stream):
+def read_bond(session, stream, bond_count):
 
     while "@<TRIPOS>BOND" not in stream.readline():
         pass
-
-    ###TEMP STATEMENT. ADD HANNAH'S CODE###
-    bond_count = 22
-    ###
 
     bond_dict = {}
 
@@ -176,7 +168,6 @@ def read_substructure(session, stream):
         pass
 
 
-    import ast
 
     substructure_dict = {}
     substructure_labels = ["subst_id", "subst_name", "root_atom", "subst_type",\
