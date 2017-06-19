@@ -20,10 +20,6 @@ print("-"*50 + "\n")
 #     return structures, status
 
 
-
-
-
-
 def print_lines(stream, num_of_lines=None):
     """for testing purposes only. delete later"""
     if num_of_lines is None:
@@ -34,8 +30,6 @@ def print_lines(stream, num_of_lines=None):
     print("\n" + ("=")*30 + "\nending test print\n"+("=")*30 + "\n")
 
 
-
-
 def _read_block(session, stream):
     """test docstring"""
     # First section should be commented out
@@ -44,13 +38,21 @@ def _read_block(session, stream):
     # Fourth section: "@<TRIPOS>BOND"
     # Fifth section: "@<TRIPOS>SUBSTRUCTURE"
 
-    import ast
     from numpy import (array, float64)
     from chimerax.core.atomic import AtomicStructure
+
+    read_comments(session, stream)
+    read_molecule(session, stream)
+    # read_atom(session, stream)
+    # read_bond(session, stream)
+    # read_substructure(session, stream)
 
     # s = AtomicStructure(session)
 
 
+def read_comments(session, stream):
+
+    import ast
     property_dict = {}
 
     comment = stream.readline()
@@ -75,32 +77,59 @@ def _read_block(session, stream):
     for key, value in property_dict.items():
         print(key, ":", value)
 
-    while "@<TRIPOS>MOLECULE" not in stream.readline().strip():
-        pass
+def read_molecule(sesson, stream):
 
-    mol_dict = {}
-    
+    import ast
+    while "@<TRIPOS>MOLECULE" not in stream.readline():
+        pass
+    molecular_dict = {}
+    mol_lables = ["mol_name", ["num_atoms", "num_bonds", "num_subst", "num_feat", "num_sets"],\
+    "mol_type", "charge_type", "status_bits"]
+    print(len(mol_lables))
+
+    for label in mol_lables:
+        molecule_line = stream.readline().split()
+        print(molecule_line)
+        print(label)
+        try:
+            if all(isinstance(ast.literal_eval(item), int) for item in molecule_line):
+                # print(molecule_line)
+                pass
+
+        except ValueError:
+            print("VALUERROR")
+        except SyntaxError:
+            print("test")
+
+
 
     # Property Dictionary should be completed at this point
 
-    ###test print. Delete later
+    # test print to check value types. Delete later
     # print()
     # for i in property_dict:
     #     val = property_dict[i]
     #     print(str(val) + " : " + str(type(val)))
 
 
-    while "@<TRIPOS>ATOM" not in stream.readline().strip():
+def read_atom(session, stream):
+
+    import ast
+    while "@<TRIPOS>ATOM" not in stream.readline():
         pass
 
-    ###TEMP STATEMENT###
-    atom_count = 20
-
+    ###TEMP STATEMENT. ADD HANNAH'S CODE###
+    atom_count = 22
     ###
+
     atom_dict = {}
 
-    for n in range(atom_count):
+    for _ in range(atom_count):
         atom_line = stream.readline()
+        if not atom_line[0].isdigit: ###THIS DOES NOT WORK
+            print(atom_line)
+            print("FAILED")
+            break
         if not atom_line:
             print("no line found")
             return None
@@ -108,33 +137,64 @@ def _read_block(session, stream):
         if len(parts) != 9:
             print("error: not enough entries")
             return None
-        if not isinstance(int(parts[0]), int):
-            print("error: first value is needs to be an integer")
-            return None
-        
+        # if not isinstance(int(parts[0]), int):
+        #     print("error: first value is needs to be an integer")
+        #     return None
+
         val_list = []
         atom_dict[int(parts[0])] = val_list
-        for v in parts[1:]:
+        for value in parts[1:]:
             try:
-                val_list.append(ast.literal_eval(v))
-            except ValueError:
-                val_list.append(str(v))
-            except SyntaxError:
-                val_list.append(str(v))
+                val_list.append(ast.literal_eval(value))
+            except (ValueError, SyntaxError):
+                val_list.append(str(value))
+
+    # PRINT TEST. DELETE LATER
     for key, value in atom_dict.items():
         print(key, ":", value)
 
-        # try:
-        #     # atom_dict[int(parts[0])] = 
-        #     pass
+
+def read_bond(session, stream):
+
+    while "@<TRIPOS>BOND" not in stream.readline():
+        pass
+
+    ###TEMP STATEMENT. ADD HANNAH'S CODE###
+    bond_count = 22
+    ###
+
+    bond_dict = {}
+
+    for _ in range(bond_count):
+        bond_line = stream.readline()
+        parts = bond_line.split()
+        if len(parts) != 4:
+            print("error: not enough entries in under bond data")
+        if not isinstance(int(parts[0]), int):
+            print("error: first value is needs to be an integer")
+            return None
+
+        bond_dict[int(parts[0])] = parts[1:3]
+
+    for key, value in bond_dict.items():
+        print(key, ":", value)
 
 
+def read_substructure(session, stream):
 
+    while "@<TRIPOS>SUBSTRUCTURE" not in stream.readline():
+        pass
 
+    substructure_line = stream.readline().split()
+    # substructure_prop = {
+    # "subst_id" : ,
+    # "subst_name" :,
+    # "root_atom" : ,
+    # "subst_type" : ,
+    # "dict_type" : ,
+    # }
 
-
-
-        # stream.close()
+    # stream.close()
 
 
 # _read_block(None, open("ras.mol2", "r"))
